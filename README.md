@@ -43,6 +43,10 @@ npm run setup  # Interactive setup for Claude Desktop
 - **Chrome/Chromium**: Required for Puppeteer (automatically handled in Docker)
 - Works with built Storybook distributions
 
+<a href="https://glama.ai/mcp/servers/@freema/mcp-design-system-extractor">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@freema/mcp-design-system-extractor/badge" alt="Design System Extractor MCP server" />
+</a>
+
 ## Features
 
 - **List Components**: Get all available components from your Storybook with compact mode
@@ -261,10 +265,10 @@ Connects to Storybook via `/index.json` and `/iframe.html` endpoints. Uses Puppe
 
 See [DEVELOPMENT.md](./DEVELOPMENT.md) for detailed development instructions.
 
+## Author
+
+Created by [Tomáš Grasl](https://www.tomasgrasl.cz/)
+
 ## License
 
 MIT
-
----
-
-Created by [Tomas Grasl](https://www.tomasgrasl.cz/)
