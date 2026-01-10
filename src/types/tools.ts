@@ -8,6 +8,7 @@ export interface ToolResponse {
 
 export interface ListComponentsInput {
   category?: string;
+  compact?: boolean;
   page?: number;
   pageSize?: number;
 }
@@ -15,6 +16,9 @@ export interface ListComponentsInput {
 export interface GetComponentHTMLInput {
   componentId: string;
   includeStyles?: boolean;
+  variantsOnly?: boolean;
+  async?: boolean;
+  timeout?: number;
 }
 
 export interface GetComponentVariantsInput {
@@ -22,7 +26,8 @@ export interface GetComponentVariantsInput {
 }
 
 export interface SearchComponentsInput {
-  query: string;
+  query?: string;
+  purpose?: string;
   searchIn?: 'name' | 'title' | 'category' | 'all';
   page?: number;
   pageSize?: number;

@@ -3,12 +3,16 @@ import { StorybookClient } from '../utils/storybook-client.js';
 import { formatSuccessResponse, handleErrorWithContext } from '../utils/error-handler.js';
 import { validateListComponentsInput } from '../utils/validators.js';
 import { applyPagination, formatPaginationMessage } from '../utils/pagination.js';
-import { mapStoriesToComponents, getComponentsArray } from '../utils/story-mapper.js';
+import {
+  mapStoriesToComponents,
+  getComponentsArray,
+  toCompactComponents,
+} from '../utils/story-mapper.js';
 
 export const listComponentsTool: Tool = {
   name: 'list_components',
   description:
-    'List all UI components available in your design system/Storybook. Returns components like modals, dialogs, buttons, forms, cards, etc. with their names, categories, and stories. Use this to explore what components are available for building UI features. Use category="all" or omit category parameter to list all components. Supports pagination to handle large component libraries.',
+    'List all UI components available in your design system/Storybook. Returns components like modals, dialogs, buttons, forms, cards, etc. with their names, categories, and variant count. Use this to explore what components are available for building UI features. Use category="all" or omit category parameter to list all components. Supports pagination to handle large component libraries.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -17,13 +21,18 @@ export const listComponentsTool: Tool = {
         description:
           'Filter components by category path (e.g., "Components/Buttons", "Layout"). Use "all" or omit to list all components.',
       },
+      compact: {
+        type: 'boolean',
+        description:
+          'If true (default), returns compact format with only id, name, title, and variantCount. If false, returns full component data including all stories.',
+      },
       page: {
         type: 'number',
         description: 'Page number (1-based). Default is 1.',
       },
       pageSize: {
         type: 'number',
-        description: 'Number of components per page (1-100). Default is 50.',
+        description: 'Number of components per page (1-100). Default is 20.',
       },
     },
     required: [],
@@ -81,10 +90,16 @@ export async function handleListComponents(input: any) {
     const message = formatPaginationMessage(
       paginationResult,
       'Found',
-      `filter: ${validatedInput.category || 'none'}`
+      `filter: ${validatedInput.category || 'none'}, compact: ${validatedInput.compact !== false}`
     );
 
-    return formatSuccessResponse(paginationResult.items, message);
+    // Return compact or full format based on parameter (default: compact)
+    const items =
+      validatedInput.compact !== false
+        ? toCompactComponents(paginationResult.items)
+        : paginationResult.items;
+
+    return formatSuccessResponse(items, message);
   } catch (error) {
     return handleErrorWithContext(error, 'list components', {
       resource: 'components list',

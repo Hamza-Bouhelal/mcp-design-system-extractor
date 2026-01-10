@@ -1,5 +1,13 @@
 import { ComponentInfo } from '../types/storybook.js';
 
+export interface CompactComponentInfo {
+  id: string;
+  name: string;
+  title: string;
+  category?: string;
+  variantCount: number;
+}
+
 export interface StoryMappingOptions {
   filterFn?: ((story: any, componentName: string, category?: string) => boolean) | undefined;
   useComponentKey?: 'name' | 'title' | undefined;
@@ -50,4 +58,24 @@ export function mapStoriesToComponents(
 
 export function getComponentsArray(componentMap: Map<string, ComponentInfo>): ComponentInfo[] {
   return Array.from(componentMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
+ * Convert full component info to compact format (smaller response size)
+ */
+export function toCompactComponent(component: ComponentInfo): CompactComponentInfo {
+  return {
+    id: component.id,
+    name: component.name,
+    title: component.title,
+    ...(component.category && { category: component.category }),
+    variantCount: component.stories?.length || 0,
+  };
+}
+
+/**
+ * Convert array of components to compact format
+ */
+export function toCompactComponents(components: ComponentInfo[]): CompactComponentInfo[] {
+  return components.map(toCompactComponent);
 }

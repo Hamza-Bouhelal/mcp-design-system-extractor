@@ -11,34 +11,40 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 
 import * as tools from './tools/index.js';
+import { jobQueue } from './services/job-queue.js';
 
 const toolHandlers = new Map<string, (input: any) => Promise<any>>([
   ['list_components', tools.handleListComponents],
   ['get_component_html', tools.handleGetComponentHTML],
-  ['get_component_variants', tools.handleGetComponentVariants],
   ['search_components', tools.handleSearchComponents],
   ['get_component_dependencies', tools.handleGetComponentDependencies],
   ['get_theme_info', tools.handleGetThemeInfo],
-  ['get_component_by_purpose', tools.handleGetComponentByPurpose],
   ['get_external_css', tools.handleGetExternalCSS],
+  ['job_status', tools.handleJobStatus],
+  ['job_cancel', tools.handleJobCancel],
+  ['job_list', tools.handleJobList],
 ]);
 
 const allTools = [
   tools.listComponentsTool,
   tools.getComponentHTMLTool,
-  tools.getComponentVariantsTool,
   tools.searchComponentsTool,
   tools.getComponentDependenciesTool,
   tools.getThemeInfoTool,
-  tools.getComponentByPurposeTool,
   tools.getExternalCSSTool,
+  tools.jobStatusTool,
+  tools.jobCancelTool,
+  tools.jobListTool,
 ];
 
 async function main() {
+  // Start the background job processor for async operations
+  jobQueue.startProcessor();
+
   const server = new Server(
     {
       name: 'design-system-extractor',
-      version: '1.0.0',
+      version: '1.1.0',
       description:
         'Extract and use components from your Storybook design system. Find UI components like modals, dialogs, buttons, forms, and more. Helps integrate design system components into your projects.',
     },

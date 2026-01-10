@@ -1,25 +1,22 @@
 # MCP Design System Extractor
 
-A Model Context Protocol (MCP) server that extracts component information from Storybook design systems. Connects to Storybook instances (including https://storybook.js.org distributions) and extracts HTML, styles, and component metadata.
+A Model Context Protocol (MCP) server that extracts component information from Storybook design systems. Connects to Storybook instances and extracts HTML, styles, and component metadata.
 
 ## Key Dependencies
 
 - **Puppeteer**: Uses headless Chrome for dynamic JavaScript component rendering
 - **Chrome/Chromium**: Required for Puppeteer (automatically handled in Docker)
-- Works with built Storybook distributions from https://storybook.js.org
+- Works with built Storybook distributions
 
 ## Features
 
-- 🔍 **List Components**: Get all available components from your Storybook
-- 📄 **Extract HTML**: Get the rendered HTML of any component variant with dynamic JavaScript support
-- 🔎 **Search Components**: Find components by name, title, or category
-- 🎛️ **Component Props**: Get component props/API documentation including types and defaults
-- 🔗 **Component Dependencies**: Analyze which components are used within other components
-- 📐 **Layout Components**: Get all layout components (Grid, Container, Stack, etc.) with examples
-- 🎨 **Theme Information**: Extract design system theme (colors, spacing, typography, breakpoints)
-- 🎯 **Search by Purpose**: Find components by their purpose (form inputs, navigation, feedback)
-- 🧩 **Composition Examples**: Get examples of how components are combined together
-- 📝 **External CSS Analysis**: Fetch and analyze CSS files to extract design tokens and variables
+- **List Components**: Get all available components from your Storybook with compact mode
+- **Extract HTML**: Get the rendered HTML of any component (async or sync mode)
+- **Search Components**: Find components by name, title, category, or purpose
+- **Component Dependencies**: Analyze which components are used within other components
+- **Theme Information**: Extract design system theme (colors, spacing, typography)
+- **External CSS Analysis**: Fetch and analyze CSS files to extract design tokens
+- **Async Job Queue**: Long-running operations run in background with job tracking
 
 ## Quick Start
 
@@ -37,178 +34,138 @@ export STORYBOOK_URL=http://localhost:6006
 
 See [DEVELOPMENT.md](./DEVELOPMENT.md) for detailed setup instructions.
 
-## Available Tools
+## Available Tools (9 total)
 
 ### Core Tools
 
 1. **list_components**
    - Lists all available components from the Storybook instance
-   - Returns components with their names, categories, and associated stories
-   - Use `category: "all"` or omit category parameter to list all components
-   - Filter by specific category path (e.g., "Components/Buttons", "Layout")
-   - Supports pagination with `page` and `pageSize` parameters (default: 50 per page)
+   - Use `compact: true` for minimal output (reduces response size)
+   - Filter by `category` parameter
+   - Supports pagination with `page` and `pageSize` (default: 20)
 
 2. **get_component_html**
-   - Extracts HTML from a specific component story in Storybook
-   - Requires story ID format: "component-name--story-name" (e.g., "button--primary")
-   - Use list_components or get_component_variants first to find valid story IDs
-   - Optional CSS style extraction for understanding component styling
-   - Supports dynamic JavaScript-rendered content
+   - Extracts HTML from a specific component story
+   - **Async by default**: Returns `job_id`, use `job_status` to poll for results
+   - Set `async: false` for synchronous mode (uses `timeout` parameter)
+   - Use `variantsOnly: true` to get list of available variants (sync, fast)
+   - Optional `includeStyles: true` for CSS extraction (Storybook CSS filtered out)
+   - Story ID format: `"component-name--story-name"` or just `"component-name"` (auto-resolves to default variant)
 
-3. **get_component_variants**
-   - Gets all story variants/states for a specific component
-   - Returns all stories (variants) for a component with their IDs, names, and parameters
-   - Component name must match exactly as shown in list_components (case-sensitive)
-
-4. **search_components**
-   - Search components by name, title, or category using case-insensitive partial matching
-   - Name is component name only (e.g., "Button")
-   - Title is full story path (e.g., "Components/Forms/Button")  
-   - Category is the grouping (e.g., "Components/Forms")
-   - Use `query: "*"` to list all components
-   - Search in specific fields: "name", "title", "category", or "all" (default)
-   - Supports pagination with `page` and `pageSize` parameters (default: 50 per page)
+3. **search_components**
+   - Search components by name, title, category, or purpose
+   - `query`: Search term (use `"*"` for all)
+   - `purpose`: Find by function ("form inputs", "navigation", "feedback", "buttons", etc.)
+   - `searchIn`: "name", "title", "category", or "all" (default)
+   - Supports pagination with `page` and `pageSize`
 
 ### Component Analysis Tools
 
-5. **get_component_props**
-   - Extracts component props/API documentation from Storybook's argTypes configuration
-   - Includes prop names, types, default values, required status, and control options
-   - Requires story ID format: "component-name--story-name"
-
-6. **get_component_dependencies**
-   - Analyzes rendered HTML to find which other components a given component internally uses
+4. **get_component_dependencies**
+   - Analyzes rendered HTML to find which other components are used internally
    - Detects React components, web components, and CSS class patterns
-   - Helps understand component relationships and composition
-   - Requires story ID format: "component-name--story-name"
+   - Requires story ID format: `"component-name--story-name"`
 
 ### Design System Tools
 
-7. **get_layout_components**
-   - Gets all layout components (Grid, Container, Stack, Box) with usage examples
-   - Optional HTML examples for each layout component
-   - Useful for understanding page structure and composition patterns
+5. **get_theme_info**
+   - Extracts design system theme (colors, spacing, typography, breakpoints)
+   - Gets CSS custom properties/variables
+   - Use `includeAll: true` for all CSS variables
 
-8. **get_theme_info**
-   - Gets design system theme information (colors, spacing, typography, breakpoints)
-   - Extracts CSS custom properties/variables from the design system
-   - Categorizes tokens by type for better organization
-   - Optional parameter to include all CSS custom properties found
+6. **get_external_css**
+   - **DEFAULT**: Returns only design tokens + file stats (avoids token limits)
+   - Extracts & categorizes tokens: colors, spacing, typography, shadows
+   - Use `includeFullCSS: true` only when you need full CSS content
+   - Security-protected: only accepts URLs from same domain as Storybook
 
-### Discovery Tools
+### Job Management Tools
 
-9. **get_component_by_purpose**
-   - Search for components by their purpose or function
-   - Available purposes: "form inputs" (input fields, selects, checkboxes), "navigation" (menus, breadcrumbs, tabs), "feedback" (alerts, toasts, modals), "data display" (tables, cards, lists), "layout" (grids, containers, dividers), "buttons" (all button types), "progress" (loaders, spinners), "media" (images, videos, carousels)
-   - Flexible pattern matching for finding components by use case
-   - Supports pagination with `page` and `pageSize` parameters (default: 50 per page)
+7. **job_status**
+   - Check status of an async job
+   - Returns: `status`, `result` (when completed), `error` (when failed)
+   - Poll this after calling `get_component_html` in async mode
 
-10. **get_component_composition_examples**
-    - Gets examples of how components are combined together in real-world patterns and layouts
-    - Returns HTML examples showing the component used with other components in forms, cards, layouts, or complex UI patterns
-    - Helps understand how components work together in practice
-    - Optional limit parameter to control number of examples returned
+8. **job_cancel**
+   - Cancel a queued or running job
+   - Returns whether cancellation was successful
 
-11. **get_external_css** ⚠️ **TOKEN-OPTIMIZED**
-    - **DEFAULT**: Returns ONLY design tokens + file stats (avoids token limits)
-    - **Does NOT return CSS content** by default (prevents 25K token limit errors)
-    - Extracts & categorizes tokens: colors, spacing, typography, shadows, breakpoints
-    - Use `includeFullCSS: true` only when you specifically need CSS content
-    - Security-protected: only accepts URLs from the same domain as your Storybook
-    - **Perfect for design token extraction without hitting response size limits**
+9. **job_list**
+   - List all jobs with their status
+   - Filter by `status`: "all" (default), "active" (queued/running), "completed"
+   - Returns job list + queue statistics
 
 ## Example Usage
 
 ```typescript
-// List all components (recommended first step)
-await listComponents({ category: "all" });
+// List all components (compact mode recommended)
+await list_components({ compact: true });
 
-// Search for all components using wildcard
-await searchComponents({ query: "*", searchIn: "all" });
-
-// Search for specific components
-await searchComponents({ query: "button", searchIn: "name" });
-
-// Get all variants of a specific component
-await getComponentVariants({ componentName: "Button" });
-
-// Get HTML for a specific button variant (use exact story ID from above)
-await getComponentHTML({ 
-  componentId: "button--primary",
-  includeStyles: true 
-});
-
-// Get component props documentation
-await getComponentProps({
-  componentId: "button--primary"
-});
+// Search for components
+await search_components({ query: "button", searchIn: "name" });
 
 // Find components by purpose
-await getComponentByPurpose({
-  purpose: "form inputs"
-});
+await search_components({ purpose: "form inputs" });
 
-// Get layout components with examples
-await getLayoutComponents({
-  includeExamples: true
+// Get variants for a component
+await get_component_html({
+  componentId: "button",
+  variantsOnly: true
 });
+// Returns: { variants: ["primary", "secondary", "disabled"] }
 
-// Extract theme information
-await getThemeInfo({
-  includeAll: false
-});
+// Get HTML (async mode - default)
+await get_component_html({ componentId: "button--primary" });
+// Returns: { job_id: "job_xxx", status: "queued" }
 
-// Analyze component dependencies
-await getComponentDependencies({
-  componentId: "card--default"
-});
+// Poll for result
+await job_status({ job_id: "job_xxx" });
+// Returns: { status: "completed", result: { html: "...", classes: [...] } }
 
-// Get composition examples
-await getComponentCompositionExamples({
+// Get HTML (sync mode)
+await get_component_html({
   componentId: "button--primary",
-  limit: 3
+  async: false,
+  timeout: 30000
+});
+// Returns: { html: "...", classes: [...] }
+
+// Get HTML with styles
+await get_component_html({
+  componentId: "button--primary",
+  async: false,
+  includeStyles: true
 });
 
-// RECOMMENDED: Extract design tokens only (small response, avoids token limits)
-await getExternalCSS({
+// Check all running jobs
+await job_list({ status: "active" });
+
+// Extract theme info
+await get_theme_info({ includeAll: false });
+
+// Get design tokens from CSS
+await get_external_css({
   cssUrl: "https://my-storybook.com/assets/main.css"
-  // extractTokens: true (default), includeFullCSS: false (default)
-});
-
-// ONLY when you specifically need CSS content (may hit token limits)
-await getExternalCSS({
-  cssUrl: "./assets/tokens.css",
-  includeFullCSS: true,
-  maxContentSize: 10000
-});
-
-// Search with pagination
-await searchComponents({
-  query: "button",
-  page: 1,
-  pageSize: 10
 });
 ```
 
 ### AI Assistant Usage Tips
 
-When using with Claude or other AI assistants:
-
-1. **Start with discovery**: Use `list_components` with `category: "all"` or `search_components` with `query: "*"` to see all available components
-2. **Get story IDs**: Use `get_component_variants` to find exact story IDs needed for other tools
-3. **Use exact IDs**: Story IDs must be in format "component-name--story-name" (e.g., "button--primary")
-4. **Explore by purpose**: Use `get_component_by_purpose` to find components by their function
-5. **Debug issues**: Tools now include debug information when no results are found
+1. **Start with discovery**: Use `list_components` with `compact: true`
+2. **Get variants first**: Use `get_component_html` with `variantsOnly: true`
+3. **Use async for HTML**: Default async mode prevents timeouts on large components
+4. **Poll job_status**: Check job completion before reading results
+5. **Search by purpose**: Use `search_components` with `purpose` parameter
 
 ## How It Works
 
-Connects to Storybook via `/index.json` and `/iframe.html` endpoints. Uses Puppeteer with headless Chrome for dynamic JavaScript rendering. Extracts component HTML, styles, props, dependencies, and design tokens with smart caching and timeout protection.
+Connects to Storybook via `/index.json` and `/iframe.html` endpoints. Uses Puppeteer with headless Chrome for dynamic JavaScript rendering. Long-running operations use an in-memory job queue with max 2 concurrent jobs and 1-hour TTL for completed jobs.
 
 ## Troubleshooting
 
 - Ensure Storybook is running and `STORYBOOK_URL` is correct
-- Use exact story ID format: "component-name--story-name"
-- Try `list_components` first to see available components
+- Use `list_components` first to see available components
+- For large components, use async mode (default) and poll `job_status`
 - Check `/index.json` endpoint directly in browser
 - See [DEVELOPMENT.md](./DEVELOPMENT.md) for detailed troubleshooting
 

@@ -14,6 +14,7 @@ import {
 
 const ListComponentsInputSchema = z.object({
   category: z.string().optional(),
+  compact: z.boolean().optional(),
   page: z.number().int().positive().optional(),
   pageSize: z.number().int().min(1).max(100).optional(),
 });
@@ -21,6 +22,9 @@ const ListComponentsInputSchema = z.object({
 const GetComponentHTMLInputSchema = z.object({
   componentId: z.string(),
   includeStyles: z.boolean().optional(),
+  variantsOnly: z.boolean().optional(),
+  async: z.boolean().optional(),
+  timeout: z.number().int().min(5000).max(60000).optional(),
 });
 
 const GetComponentVariantsInputSchema = z.object({
@@ -28,7 +32,8 @@ const GetComponentVariantsInputSchema = z.object({
 });
 
 const SearchComponentsInputSchema = z.object({
-  query: z.string(),
+  query: z.string().optional(),
+  purpose: z.string().optional(),
   searchIn: z.enum(['name', 'title', 'category', 'all']).optional(),
   page: z.number().int().positive().optional(),
   pageSize: z.number().int().min(1).max(100).optional(),
@@ -67,6 +72,9 @@ export function validateListComponentsInput(input: any): ListComponentsInput {
   if (parsed.category !== undefined) {
     result.category = parsed.category;
   }
+  if (parsed.compact !== undefined) {
+    result.compact = parsed.compact;
+  }
   if (parsed.page !== undefined) {
     result.page = parsed.page;
   }
@@ -84,6 +92,15 @@ export function validateGetComponentHTMLInput(input: any): GetComponentHTMLInput
   if (parsed.includeStyles !== undefined) {
     result.includeStyles = parsed.includeStyles;
   }
+  if (parsed.variantsOnly !== undefined) {
+    result.variantsOnly = parsed.variantsOnly;
+  }
+  if (parsed.async !== undefined) {
+    result.async = parsed.async;
+  }
+  if (parsed.timeout !== undefined) {
+    result.timeout = parsed.timeout;
+  }
   return result;
 }
 
@@ -93,9 +110,13 @@ export function validateGetComponentVariantsInput(input: any): GetComponentVaria
 
 export function validateSearchComponentsInput(input: any): SearchComponentsInput {
   const parsed = SearchComponentsInputSchema.parse(input);
-  const result: SearchComponentsInput = {
-    query: parsed.query,
-  };
+  const result: SearchComponentsInput = {};
+  if (parsed.query !== undefined) {
+    result.query = parsed.query;
+  }
+  if (parsed.purpose !== undefined) {
+    result.purpose = parsed.purpose;
+  }
   if (parsed.searchIn !== undefined) {
     result.searchIn = parsed.searchIn;
   }
