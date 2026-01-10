@@ -15,7 +15,7 @@ export interface PaginationResult<T> {
 
 export function applyPagination<T>(items: T[], params: PaginationParams): PaginationResult<T> {
   const page = params.page || 1;
-  const pageSize = params.pageSize || 50;
+  const pageSize = params.pageSize || 20;
   const totalItems = items.length;
   const totalPages = Math.ceil(totalItems / pageSize);
   const startIndex = (page - 1) * pageSize;

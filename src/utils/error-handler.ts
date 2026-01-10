@@ -1,5 +1,5 @@
 import { ToolResponse } from '../types/tools.js';
-import { FormattedError, formatError } from './error-formatter.js';
+import { FormattedError, formatError, isSSLCertificateError } from './error-formatter.js';
 import { ErrorCategory, ErrorContext } from './error-constants.js';
 
 export function handleError(error: unknown): ToolResponse {
@@ -70,6 +70,8 @@ export function handleErrorWithContext(
     category = ErrorCategory.TIMEOUT_ERROR;
   } else if (lowerMessage.includes('not found') || lowerMessage.includes('404')) {
     category = ErrorCategory.NOT_FOUND_ERROR;
+  } else if (isSSLCertificateError(error)) {
+    category = ErrorCategory.CERTIFICATE_ERROR;
   } else if (lowerMessage.includes('cors') || lowerMessage.includes('blocked by client')) {
     category = ErrorCategory.SECURITY_ERROR;
   } else if (

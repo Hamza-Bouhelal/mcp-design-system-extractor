@@ -125,7 +125,7 @@ Key features:
 
 ### Component Extraction Issues
 - Ensure you're using the exact story ID format: "component-name--story-name"
-- Use `get_component_variants` to find valid story IDs
+- Use `get_component_html` with `variantsOnly: true` to find valid story IDs
 - Check that stories exist and are published in Storybook
 
 ### Performance Issues

@@ -1,6 +1,76 @@
 import { parse, HTMLElement } from 'node-html-parser';
 import { CSSRule, DesignToken } from '../types/storybook.js';
 
+/**
+ * Patterns to identify Storybook boilerplate CSS that should be filtered out
+ */
+const STORYBOOK_CSS_PATTERNS = [
+  /\.sb-[a-zA-Z0-9_-]+/,
+  /#storybook-[a-zA-Z0-9_-]+/,
+  /\.docs-story[a-zA-Z0-9_-]*/,
+  /@keyframes sb-[a-zA-Z0-9_-]+/,
+  /\.innerZoomElementWrapper/,
+  /\.css-[a-z0-9]+/,
+  /\[data-storyloaded\]/,
+  /\.sb-show-main/,
+  /\.sb-main-padded/,
+  /#root\[hidden\]/,
+  /body\.sb-/,
+  /\.sbdocs[a-zA-Z0-9_-]*/,
+];
+
+/**
+ * Check if a CSS selector matches Storybook boilerplate patterns
+ */
+function isStorybookSelector(selector: string): boolean {
+  return STORYBOOK_CSS_PATTERNS.some(pattern => pattern.test(selector));
+}
+
+/**
+ * Filter out Storybook boilerplate CSS from a stylesheet string
+ * Removes entire CSS rules that match Storybook-specific patterns
+ */
+export function filterStorybookCSS(css: string): string {
+  if (!css || typeof css !== 'string') {
+    return '';
+  }
+
+  const lines: string[] = [];
+  let currentRule = '';
+  let braceCount = 0;
+  let shouldSkip = false;
+
+  for (const char of css) {
+    currentRule += char;
+
+    if (char === '{') {
+      braceCount++;
+      if (braceCount === 1) {
+        const selector = currentRule.slice(0, -1).trim();
+        shouldSkip = isStorybookSelector(selector);
+      }
+    } else if (char === '}') {
+      braceCount--;
+      if (braceCount === 0) {
+        if (!shouldSkip && currentRule.trim()) {
+          lines.push(currentRule.trim());
+        }
+        currentRule = '';
+        shouldSkip = false;
+      }
+    }
+  }
+
+  return lines.join('\n\n');
+}
+
+/**
+ * Filter styles array to remove Storybook boilerplate
+ */
+export function filterStorybookStyles(styles: string[]): string[] {
+  return styles.map(style => filterStorybookCSS(style)).filter(style => style.trim().length > 0);
+}
+
 export interface ParsedHTML {
   styles: string[];
   classes: string[];

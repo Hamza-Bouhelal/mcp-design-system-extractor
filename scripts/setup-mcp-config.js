@@ -295,13 +295,14 @@ async function main() {
   console.log(`\n${colors.bright}${colors.green}🎉 Setup completed successfully!${colors.reset}`);
   console.log(`\n${colors.blue}Available MCP tools:${colors.reset}`);
   console.log('• list_components - List all available components');
-  console.log('• get_component_html - Extract HTML from components');
+  console.log('• get_component_html - Extract HTML from components (async by default)');
   console.log('• search_components - Search for specific components');
-  console.log('• get_component_variants - Get all variants of a component');
-  console.log('• get_component_styles - Analyze component styles');
-  console.log('• compare_components - Compare two component variants');
-  console.log('• analyze_component_usage - Analyze component usage patterns');
-  console.log('• export_design_tokens - Export design tokens');
+  console.log('• get_component_dependencies - Analyze component dependencies');
+  console.log('• get_theme_info - Extract theme information');
+  console.log('• get_external_css - Analyze external CSS files');
+  console.log('• job_status - Check async job status');
+  console.log('• job_cancel - Cancel async jobs');
+  console.log('• job_list - List all jobs');
 
   rl.close();
 }

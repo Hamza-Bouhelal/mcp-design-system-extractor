@@ -8,6 +8,7 @@ export interface ToolResponse {
 
 export interface ListComponentsInput {
   category?: string;
+  compact?: boolean;
   page?: number;
   pageSize?: number;
 }
@@ -15,42 +16,23 @@ export interface ListComponentsInput {
 export interface GetComponentHTMLInput {
   componentId: string;
   includeStyles?: boolean;
-}
-
-export interface GetComponentVariantsInput {
-  componentName: string;
+  variantsOnly?: boolean;
+  async?: boolean;
+  timeout?: number;
 }
 
 export interface SearchComponentsInput {
-  query: string;
+  query?: string;
+  purpose?: string;
   searchIn?: 'name' | 'title' | 'category' | 'all';
   page?: number;
   pageSize?: number;
-}
-
-export interface GetComponentPropsInput {
-  componentId: string;
 }
 
 export interface GetComponentDependenciesInput {
   componentId: string;
 }
 
-export interface GetLayoutComponentsInput {
-  includeExamples?: boolean;
-}
-
 export interface GetThemeInfoInput {
   includeAll?: boolean;
-}
-
-export interface GetComponentByPurposeInput {
-  purpose: string;
-  page?: number;
-  pageSize?: number;
-}
-
-export interface GetComponentCompositionExamplesInput {
-  componentId: string;
-  limit?: number;
 }

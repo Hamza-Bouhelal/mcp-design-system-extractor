@@ -24,13 +24,6 @@ export interface ComponentInfo {
   stories: StorybookStory[];
 }
 
-export interface ComponentVariant {
-  id: string;
-  name: string;
-  args?: Record<string, any>;
-  parameters?: Record<string, any>;
-}
-
 export interface ComponentHTML {
   storyId: string;
   html: string;
@@ -51,24 +44,6 @@ export interface DesignToken {
   category?: string;
 }
 
-export interface ComponentProps {
-  storyId: string;
-  props: Record<string, PropDefinition>;
-  defaultProps?: Record<string, any>;
-}
-
-export interface PropDefinition {
-  name: string;
-  type: string;
-  required: boolean;
-  defaultValue?: any;
-  description?: string;
-  control?: {
-    type: string;
-    options?: any[];
-  };
-}
-
 export interface ComponentDependencies {
   storyId: string;
   dependencies: string[];
@@ -83,23 +58,4 @@ export interface ThemeInfo {
   breakpoints: Record<string, string>;
   shadows: Record<string, string>;
   radii: Record<string, string>;
-}
-
-export interface ComponentByPurpose {
-  purpose: string;
-  components: ComponentInfo[];
-  description?: string;
-}
-
-export interface ComponentComposition {
-  storyId: string;
-  examples: CompositionExample[];
-}
-
-export interface CompositionExample {
-  name: string;
-  description: string;
-  html: string;
-  components: string[];
-  props?: Record<string, any>;
 }

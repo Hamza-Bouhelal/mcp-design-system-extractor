@@ -63,16 +63,16 @@ describe('validators', () => {
   });
 
   describe('validateSearchComponentsInput', () => {
-    it('should validate valid search input', () => {
+    it('should validate valid search input with query', () => {
       const input = {
         query: 'button',
         searchIn: 'name' as const,
         page: 1,
         pageSize: 20
       };
-      
+
       const result = validateSearchComponentsInput(input);
-      
+
       expect(result).toEqual({
         query: 'button',
         searchIn: 'name',
@@ -81,9 +81,35 @@ describe('validators', () => {
       });
     });
 
-    it('should require query', () => {
+    it('should validate search input with purpose only', () => {
+      const input = {
+        purpose: 'form inputs'
+      };
+
+      const result = validateSearchComponentsInput(input);
+
+      expect(result).toEqual({
+        purpose: 'form inputs'
+      });
+    });
+
+    it('should validate search input with both query and purpose', () => {
+      const input = {
+        query: 'input',
+        purpose: 'form inputs'
+      };
+
+      const result = validateSearchComponentsInput(input);
+
+      expect(result).toEqual({
+        query: 'input',
+        purpose: 'form inputs'
+      });
+    });
+
+    it('should require query or purpose', () => {
       const input = {};
-      
+
       expect(() => validateSearchComponentsInput(input)).toThrow();
     });
   });

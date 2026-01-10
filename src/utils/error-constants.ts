@@ -5,6 +5,7 @@ export enum ErrorCategory {
   VALIDATION_ERROR = 'VALIDATION_ERROR',
   PARSING_ERROR = 'PARSING_ERROR',
   SECURITY_ERROR = 'SECURITY_ERROR',
+  CERTIFICATE_ERROR = 'CERTIFICATE_ERROR',
 }
 
 export interface ErrorContext {
@@ -117,6 +118,20 @@ export const TROUBLESHOOTING_TEMPLATES = {
       description: 'Ensure CSP allows the requested operations',
     },
   ],
+  [ErrorCategory.CERTIFICATE_ERROR]: [
+    {
+      step: 1,
+      action: 'Fix the SSL Certificate',
+      description:
+        'Contact server administrator to install a valid SSL certificate (check for missing intermediate certificates)',
+    },
+    {
+      step: 2,
+      action: 'Bypass Certificate Verification',
+      description:
+        'Set NODE_TLS_REJECT_UNAUTHORIZED=0 environment variable before starting the MCP server (not recommended for production)',
+    },
+  ],
 } as const;
 
 export const ERROR_MESSAGES = {
@@ -143,5 +158,9 @@ export const ERROR_MESSAGES = {
   [ErrorCategory.SECURITY_ERROR]: {
     brief: 'Security restriction encountered',
     suggestion: 'Check CORS and security policy configuration',
+  },
+  [ErrorCategory.CERTIFICATE_ERROR]: {
+    brief: 'SSL certificate verification failed',
+    suggestion: 'The server has an invalid or self-signed SSL certificate',
   },
 } as const;

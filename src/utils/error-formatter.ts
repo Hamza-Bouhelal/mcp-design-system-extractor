@@ -259,3 +259,45 @@ export function createSecurityError(
     originalError
   );
 }
+
+/**
+ * Create standardized certificate error
+ */
+export function createCertificateError(
+  operation: string,
+  url: string,
+  originalError?: Error | string
+): FormattedError {
+  return formatError(
+    ErrorCategory.CERTIFICATE_ERROR,
+    {
+      category: ErrorCategory.CERTIFICATE_ERROR,
+      operation,
+      url,
+    },
+    originalError
+  );
+}
+
+/**
+ * Check if an error is related to SSL/TLS certificate issues
+ */
+export function isSSLCertificateError(error: unknown): boolean {
+  if (!error) {
+    return false;
+  }
+
+  const message =
+    error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+  const code = error instanceof Error && 'code' in error ? String((error as any).code) : '';
+
+  return (
+    message.includes('certificate') ||
+    message.includes('self-signed') ||
+    message.includes('unable to verify') ||
+    message.includes('ssl') ||
+    message.includes('tls') ||
+    code.includes('CERT_') ||
+    code.includes('ERR_TLS')
+  );
+}

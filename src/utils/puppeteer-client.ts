@@ -12,10 +12,14 @@ export class PuppeteerClient {
 
     this.browser = await puppeteer.launch({
       headless: true,
+      // @ts-expect-error ignoreHTTPSErrors is valid but not in LaunchOptions type
+      ignoreHTTPSErrors: true,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-web-security',
+        '--ignore-certificate-errors',
+        '--ignore-certificate-errors-spki-list',
         '--disable-features=VizDisplayCompositor',
         '--disable-background-timer-throttling',
         '--disable-backgrounding-occluded-windows',
