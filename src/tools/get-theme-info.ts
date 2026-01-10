@@ -3,7 +3,7 @@ import { StorybookClient } from '../utils/storybook-client.js';
 import { handleError, formatSuccessResponse } from '../utils/error-handler.js';
 import { validateGetThemeInfoInput } from '../utils/validators.js';
 import { ThemeInfo } from '../types/storybook.js';
-import { extractDesignTokens } from '../utils/html-parser.js';
+import { extractDesignTokens } from '../utils/html-css-parser.js';
 
 export const getThemeInfoTool: Tool = {
   name: 'get_theme_info',

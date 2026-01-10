@@ -70,7 +70,7 @@ class JobQueue {
     this.queue.push(jobId);
 
     // Trigger processing
-    this.processQueue();
+    void this.processQueue();
 
     return jobId;
   }
@@ -80,17 +80,30 @@ class JobQueue {
    */
   getStatus(jobId: string): JobResult | null {
     const job = this.jobs.get(jobId);
-    if (!job) return null;
+    if (!job) {
+      return null;
+    }
 
-    return {
+    const result: JobResult = {
       job_id: job.id,
       status: job.status,
-      result: job.result,
-      error: job.error,
       created_at: job.createdAt,
-      started_at: job.startedAt,
-      completed_at: job.completedAt,
     };
+
+    if (job.result !== undefined) {
+      result.result = job.result;
+    }
+    if (job.error !== undefined) {
+      result.error = job.error;
+    }
+    if (job.startedAt !== undefined) {
+      result.started_at = job.startedAt;
+    }
+    if (job.completedAt !== undefined) {
+      result.completed_at = job.completedAt;
+    }
+
+    return result;
   }
 
   /**
@@ -98,7 +111,9 @@ class JobQueue {
    */
   cancel(jobId: string): boolean {
     const job = this.jobs.get(jobId);
-    if (!job) return false;
+    if (!job) {
+      return false;
+    }
 
     if (job.status === 'queued') {
       job.status = 'cancelled';
@@ -127,17 +142,21 @@ class JobQueue {
   private async processQueue(): Promise<void> {
     while (this.queue.length > 0 && this.processing.size < this.maxConcurrent) {
       const jobId = this.queue.shift();
-      if (!jobId) break;
+      if (!jobId) {
+        break;
+      }
 
       const job = this.jobs.get(jobId);
-      if (!job || job.status === 'cancelled') continue;
+      if (!job || job.status === 'cancelled') {
+        continue;
+      }
 
       this.processing.add(jobId);
-      this.executeJob(jobId).finally(() => {
+      void this.executeJob(jobId).finally(() => {
         this.processing.delete(jobId);
         // Check for more jobs
         if (this.queue.length > 0) {
-          this.processQueue();
+          void this.processQueue();
         }
       });
     }
@@ -148,7 +167,9 @@ class JobQueue {
    */
   private async executeJob(jobId: string): Promise<void> {
     const job = this.jobs.get(jobId);
-    if (!job) return;
+    if (!job) {
+      return;
+    }
 
     job.status = 'running';
     job.startedAt = Date.now();
@@ -157,8 +178,10 @@ class JobQueue {
       if (job.toolName === 'get_component_html') {
         const result = await this.executeGetComponentHTML(job.input);
 
-        // Check if cancelled during execution
-        if (job.status === 'cancelled') return;
+        // Check if cancelled during execution (status can be changed by cancel())
+        if ((job.status as JobStatus) === 'cancelled') {
+          return;
+        }
 
         job.result = result;
         job.status = 'completed';
@@ -166,7 +189,8 @@ class JobQueue {
         throw new Error(`Unknown tool: ${job.toolName}`);
       }
     } catch (error: any) {
-      if (job.status !== 'cancelled') {
+      // Check if cancelled during execution (status can be changed by cancel())
+      if ((job.status as JobStatus) !== 'cancelled') {
         job.error = error.message || 'Unknown error';
         job.status = 'failed';
       }
@@ -206,10 +230,14 @@ class JobQueue {
       let defaultStoryId: string | null = null;
 
       for (const [id] of Object.entries(storiesData as Record<string, any>)) {
-        const storyComponentId = id.split('--')[0];
+        const storyComponentId = id.split('--')[0] || '';
         if (storyComponentId.toLowerCase() === componentIdLower) {
-          if (!resolvedStoryId) resolvedStoryId = id;
-          if (id.endsWith('--default')) defaultStoryId = id;
+          if (!resolvedStoryId) {
+            resolvedStoryId = id;
+          }
+          if (id.endsWith('--default')) {
+            defaultStoryId = id;
+          }
         }
       }
 
@@ -265,19 +293,24 @@ class JobQueue {
    * Start background processor
    */
   startProcessor(): void {
-    if (this.processorInterval) return;
+    if (this.processorInterval) {
+      return;
+    }
 
     // Process queue every second
     this.processorInterval = setInterval(() => {
       if (this.queue.length > 0 && this.processing.size < this.maxConcurrent) {
-        this.processQueue();
+        void this.processQueue();
       }
     }, 1000);
 
     // Cleanup every 5 minutes
-    this.cleanupInterval = setInterval(() => {
-      this.cleanup();
-    }, 5 * 60 * 1000);
+    this.cleanupInterval = setInterval(
+      () => {
+        this.cleanup();
+      },
+      5 * 60 * 1000
+    );
   }
 
   /**
@@ -327,9 +360,7 @@ class JobQueue {
   /**
    * List all jobs with optional filter
    */
-  listJobs(
-    filter: 'all' | 'active' | 'completed' = 'all'
-  ): Array<{
+  listJobs(filter: 'all' | 'active' | 'completed' = 'all'): Array<{
     job_id: string;
     status: JobStatus;
     component_id: string;
@@ -346,16 +377,31 @@ class JobQueue {
 
     for (const job of this.jobs.values()) {
       // Apply filter
-      if (filter === 'active' && !['queued', 'running'].includes(job.status)) continue;
-      if (filter === 'completed' && ['queued', 'running'].includes(job.status)) continue;
+      if (filter === 'active' && !['queued', 'running'].includes(job.status)) {
+        continue;
+      }
+      if (filter === 'completed' && ['queued', 'running'].includes(job.status)) {
+        continue;
+      }
 
-      result.push({
+      const item: {
+        job_id: string;
+        status: JobStatus;
+        component_id: string;
+        created_at: number;
+        started_at?: number;
+      } = {
         job_id: job.id,
         status: job.status,
         component_id: job.input?.componentId || 'unknown',
         created_at: job.createdAt,
-        started_at: job.startedAt,
-      });
+      };
+
+      if (job.startedAt !== undefined) {
+        item.started_at = job.startedAt;
+      }
+
+      result.push(item);
     }
 
     return result;

@@ -283,9 +283,12 @@ export function createCertificateError(
  * Check if an error is related to SSL/TLS certificate issues
  */
 export function isSSLCertificateError(error: unknown): boolean {
-  if (!error) return false;
+  if (!error) {
+    return false;
+  }
 
-  const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+  const message =
+    error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
   const code = error instanceof Error && 'code' in error ? String((error as any).code) : '';
 
   return (

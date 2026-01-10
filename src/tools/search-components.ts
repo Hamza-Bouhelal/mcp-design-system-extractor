@@ -11,41 +11,93 @@ import { mapStoriesToComponents, getComponentsArray } from '../utils/story-mappe
 const PURPOSE_PATTERNS: Record<string, { patterns: RegExp[]; description: string }> = {
   'form inputs': {
     patterns: [
-      /input/i, /textfield/i, /textarea/i, /select/i, /dropdown/i,
-      /checkbox/i, /radio/i, /switch/i, /toggle/i, /slider/i,
-      /datepicker/i, /timepicker/i, /form/i, /field/i,
+      /input/i,
+      /textfield/i,
+      /textarea/i,
+      /select/i,
+      /dropdown/i,
+      /checkbox/i,
+      /radio/i,
+      /switch/i,
+      /toggle/i,
+      /slider/i,
+      /datepicker/i,
+      /timepicker/i,
+      /form/i,
+      /field/i,
     ],
     description: 'Components for collecting user input in forms',
   },
   navigation: {
     patterns: [
-      /nav/i, /menu/i, /breadcrumb/i, /tabs?/i, /stepper/i,
-      /pagination/i, /link/i, /sidebar/i, /drawer/i, /appbar/i,
-      /toolbar/i, /header/i,
+      /nav/i,
+      /menu/i,
+      /breadcrumb/i,
+      /tabs?/i,
+      /stepper/i,
+      /pagination/i,
+      /link/i,
+      /sidebar/i,
+      /drawer/i,
+      /appbar/i,
+      /toolbar/i,
+      /header/i,
     ],
     description: 'Components for navigating through the application',
   },
   feedback: {
     patterns: [
-      /alert/i, /snackbar/i, /toast/i, /notification/i, /message/i,
-      /error/i, /warning/i, /success/i, /info/i, /banner/i,
-      /dialog/i, /modal/i, /popup/i, /tooltip/i, /popover/i,
+      /alert/i,
+      /snackbar/i,
+      /toast/i,
+      /notification/i,
+      /message/i,
+      /error/i,
+      /warning/i,
+      /success/i,
+      /info/i,
+      /banner/i,
+      /dialog/i,
+      /modal/i,
+      /popup/i,
+      /tooltip/i,
+      /popover/i,
     ],
     description: 'Components for providing feedback to users',
   },
   'data display': {
     patterns: [
-      /table/i, /datagrid/i, /list/i, /card/i, /chip/i,
-      /badge/i, /avatar/i, /image/i, /icon/i, /typography/i,
-      /text/i, /label/i, /tag/i,
+      /table/i,
+      /datagrid/i,
+      /list/i,
+      /card/i,
+      /chip/i,
+      /badge/i,
+      /avatar/i,
+      /image/i,
+      /icon/i,
+      /typography/i,
+      /text/i,
+      /label/i,
+      /tag/i,
     ],
     description: 'Components for displaying data and content',
   },
   layout: {
     patterns: [
-      /grid/i, /container/i, /box/i, /stack/i, /flex/i,
-      /spacer/i, /divider/i, /layout/i, /panel/i, /section/i,
-      /wrapper/i, /column/i, /row/i,
+      /grid/i,
+      /container/i,
+      /box/i,
+      /stack/i,
+      /flex/i,
+      /spacer/i,
+      /divider/i,
+      /layout/i,
+      /panel/i,
+      /section/i,
+      /wrapper/i,
+      /column/i,
+      /row/i,
     ],
     description: 'Components for structuring and laying out content',
   },
@@ -55,15 +107,26 @@ const PURPOSE_PATTERNS: Record<string, { patterns: RegExp[]; description: string
   },
   progress: {
     patterns: [
-      /progress/i, /loading/i, /spinner/i, /skeleton/i,
-      /loader/i, /circular.*progress/i, /linear.*progress/i,
+      /progress/i,
+      /loading/i,
+      /spinner/i,
+      /skeleton/i,
+      /loader/i,
+      /circular.*progress/i,
+      /linear.*progress/i,
     ],
     description: 'Components for showing loading and progress states',
   },
   media: {
     patterns: [
-      /image/i, /video/i, /audio/i, /media/i,
-      /gallery/i, /carousel/i, /slider/i, /player/i,
+      /image/i,
+      /video/i,
+      /audio/i,
+      /media/i,
+      /gallery/i,
+      /carousel/i,
+      /slider/i,
+      /player/i,
     ],
     description: 'Components for displaying media content',
   },
@@ -198,9 +261,15 @@ export async function handleSearchComponents(input: any) {
 
     // Build search description
     const searchDesc = [];
-    if (hasTextQuery) searchDesc.push(`query: "${query}"`);
-    if (purpose) searchDesc.push(`purpose: "${purpose}"`);
-    if (!hasTextQuery && !purpose && isWildcard) searchDesc.push('all components');
+    if (hasTextQuery) {
+      searchDesc.push(`query: "${query}"`);
+    }
+    if (purpose) {
+      searchDesc.push(`purpose: "${purpose}"`);
+    }
+    if (!hasTextQuery && !purpose && isWildcard) {
+      searchDesc.push('all components');
+    }
 
     const message = formatPaginationMessage(
       paginationResult,

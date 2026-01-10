@@ -55,7 +55,7 @@ export async function handleGetComponentHTML(input: any) {
 
       const variants: string[] = [];
       for (const [storyId] of Object.entries(storiesData as Record<string, any>)) {
-        const storyComponentId = storyId.split('--')[0];
+        const storyComponentId = storyId.split('--')[0] || '';
         if (storyComponentId.toLowerCase() === componentId) {
           const variantName = storyId.split('--')[1] || 'default';
           variants.push(variantName);

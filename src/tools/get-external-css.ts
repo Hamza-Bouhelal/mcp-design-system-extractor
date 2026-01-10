@@ -1,7 +1,7 @@
 import { Tool } from '@modelcontextprotocol/sdk/types.js';
 import { StorybookClient } from '../utils/storybook-client.js';
 import { formatSuccessResponse, handleErrorWithContext } from '../utils/error-handler.js';
-import { extractDesignTokens } from '../utils/html-parser.js';
+import { extractDesignTokens } from '../utils/html-css-parser.js';
 import { DesignToken } from '../types/storybook.js';
 import {
   createSecurityError,

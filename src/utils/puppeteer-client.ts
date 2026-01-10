@@ -12,6 +12,7 @@ export class PuppeteerClient {
 
     this.browser = await puppeteer.launch({
       headless: true,
+      // @ts-expect-error ignoreHTTPSErrors is valid but not in LaunchOptions type
       ignoreHTTPSErrors: true,
       args: [
         '--no-sandbox',

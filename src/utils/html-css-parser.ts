@@ -36,7 +36,6 @@ export function filterStorybookCSS(css: string): string {
   }
 
   const lines: string[] = [];
-  let inRule = false;
   let currentRule = '';
   let braceCount = 0;
   let shouldSkip = false;
@@ -47,7 +46,6 @@ export function filterStorybookCSS(css: string): string {
     if (char === '{') {
       braceCount++;
       if (braceCount === 1) {
-        inRule = true;
         const selector = currentRule.slice(0, -1).trim();
         shouldSkip = isStorybookSelector(selector);
       }
@@ -58,7 +56,6 @@ export function filterStorybookCSS(css: string): string {
           lines.push(currentRule.trim());
         }
         currentRule = '';
-        inRule = false;
         shouldSkip = false;
       }
     }
@@ -71,9 +68,7 @@ export function filterStorybookCSS(css: string): string {
  * Filter styles array to remove Storybook boilerplate
  */
 export function filterStorybookStyles(styles: string[]): string[] {
-  return styles
-    .map(style => filterStorybookCSS(style))
-    .filter(style => style.trim().length > 0);
+  return styles.map(style => filterStorybookCSS(style)).filter(style => style.trim().length > 0);
 }
 
 export interface ParsedHTML {

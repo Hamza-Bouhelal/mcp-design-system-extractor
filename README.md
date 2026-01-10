@@ -2,6 +2,41 @@
 
 A Model Context Protocol (MCP) server that extracts component information from Storybook design systems. Connects to Storybook instances and extracts HTML, styles, and component metadata.
 
+![Demo](assets/demo.gif)
+
+## Installation
+
+### Using Claude CLI (Recommended)
+
+```bash
+claude mcp add design-system npx mcp-design-system-extractor@latest \
+  --env STORYBOOK_URL=http://localhost:6006
+```
+
+With self-signed certificate:
+```bash
+claude mcp add design-system npx mcp-design-system-extractor@latest \
+  --env STORYBOOK_URL=https://my-storybook.example.com \
+  --env NODE_TLS_REJECT_UNAUTHORIZED=0
+```
+
+### Using npm
+
+```bash
+npm install -g mcp-design-system-extractor
+```
+
+Then configure in your MCP client (see [Environment Variables](#environment-variables)).
+
+### From Source
+
+```bash
+git clone https://github.com/freema/mcp-design-system-extractor.git
+cd mcp-design-system-extractor
+npm install && npm run build
+npm run setup  # Interactive setup for Claude Desktop
+```
+
 ## Key Dependencies
 
 - **Puppeteer**: Uses headless Chrome for dynamic JavaScript component rendering
@@ -18,16 +53,27 @@ A Model Context Protocol (MCP) server that extracts component information from S
 - **External CSS Analysis**: Fetch and analyze CSS files to extract design tokens
 - **Async Job Queue**: Long-running operations run in background with job tracking
 
-## Quick Start
+## Environment Variables
 
-```bash
-npm install && npm run build
-npm run setup  # Interactive setup for Claude Desktop
-```
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `STORYBOOK_URL` | URL of your Storybook instance | `http://localhost:6006` |
+| `NODE_TLS_REJECT_UNAUTHORIZED` | Set to `0` to skip SSL certificate verification (for self-signed certs) | `1` |
 
-Or set manually:
-```bash
-export STORYBOOK_URL=http://localhost:6006
+**Example with self-signed certificate:**
+```json
+{
+  "mcpServers": {
+    "design-system": {
+      "command": "node",
+      "args": ["/path/to/dist/index.js"],
+      "env": {
+        "STORYBOOK_URL": "https://my-storybook.example.com",
+        "NODE_TLS_REJECT_UNAUTHORIZED": "0"
+      }
+    }
+  }
+}
 ```
 
 ## Usage
@@ -157,6 +203,41 @@ await get_external_css({
 4. **Poll job_status**: Check job completion before reading results
 5. **Search by purpose**: Use `search_components` with `purpose` parameter
 
+## Example Prompts
+
+Once connected, you can use natural language prompts with Claude:
+
+![MCP Servers Connected](assets/mcp-servers.png)
+
+**Component Discovery:**
+```
+Show me all available button components in the design system
+```
+
+**Building New Features:**
+```
+I need to create a user profile card. Find relevant components
+from the design system and show me their HTML structure.
+```
+
+**Design System Analysis:**
+```
+Extract the color palette and typography tokens from the design system.
+I want to ensure my new component matches the existing styles.
+```
+
+**Component Migration:**
+```
+Get the HTML and styles for the "alert" component. I need to
+recreate it in a different framework while keeping the same look.
+```
+
+**Multi-Tool Workflow:**
+```
+First list all form-related components, then get the HTML for
+the input and select components. I'm building a registration form.
+```
+
 ## How It Works
 
 Connects to Storybook via `/index.json` and `/iframe.html` endpoints. Uses Puppeteer with headless Chrome for dynamic JavaScript rendering. Long-running operations use an in-memory job queue with max 2 concurrent jobs and 1-hour TTL for completed jobs.
@@ -167,6 +248,7 @@ Connects to Storybook via `/index.json` and `/iframe.html` endpoints. Uses Puppe
 - Use `list_components` first to see available components
 - For large components, use async mode (default) and poll `job_status`
 - Check `/index.json` endpoint directly in browser
+- **SSL certificate errors**: Set `NODE_TLS_REJECT_UNAUTHORIZED=0` for self-signed certificates
 - See [DEVELOPMENT.md](./DEVELOPMENT.md) for detailed troubleshooting
 
 ## Requirements
@@ -182,3 +264,7 @@ See [DEVELOPMENT.md](./DEVELOPMENT.md) for detailed development instructions.
 ## License
 
 MIT
+
+---
+
+Created by [Tomas Grasl](https://www.tomasgrasl.cz/)

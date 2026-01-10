@@ -120,7 +120,7 @@ export class StorybookClient {
         const notFoundError = createNotFoundError(
           'fetch component HTML',
           'story',
-          'Use list_components or get_component_variants tools to find available stories',
+          'Use list_components or get_component_html with variantsOnly=true to find available stories',
           storyId
         );
         throw new Error(notFoundError.message);
@@ -204,15 +204,6 @@ export class StorybookClient {
         error
       );
       throw new Error(connectionError.message);
-    }
-  }
-
-  async testConnection(): Promise<boolean> {
-    try {
-      const response = await fetch(`${this.baseUrl}/iframe.html`);
-      return response.ok;
-    } catch (error) {
-      return false;
     }
   }
 }

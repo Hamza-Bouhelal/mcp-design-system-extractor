@@ -21,10 +21,6 @@ export interface GetComponentHTMLInput {
   timeout?: number;
 }
 
-export interface GetComponentVariantsInput {
-  componentName: string;
-}
-
 export interface SearchComponentsInput {
   query?: string;
   purpose?: string;
@@ -33,29 +29,10 @@ export interface SearchComponentsInput {
   pageSize?: number;
 }
 
-export interface GetComponentPropsInput {
-  componentId: string;
-}
-
 export interface GetComponentDependenciesInput {
   componentId: string;
 }
 
-export interface GetLayoutComponentsInput {
-  includeExamples?: boolean;
-}
-
 export interface GetThemeInfoInput {
   includeAll?: boolean;
-}
-
-export interface GetComponentByPurposeInput {
-  purpose: string;
-  page?: number;
-  pageSize?: number;
-}
-
-export interface GetComponentCompositionExamplesInput {
-  componentId: string;
-  limit?: number;
 }
