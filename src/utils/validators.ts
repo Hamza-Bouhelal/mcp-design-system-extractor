@@ -22,13 +22,17 @@ const GetComponentHTMLInputSchema = z.object({
   timeout: z.number().int().min(5000).max(60000).optional(),
 });
 
-const SearchComponentsInputSchema = z.object({
-  query: z.string().optional(),
-  purpose: z.string().optional(),
-  searchIn: z.enum(['name', 'title', 'category', 'all']).optional(),
-  page: z.number().int().positive().optional(),
-  pageSize: z.number().int().min(1).max(100).optional(),
-});
+const SearchComponentsInputSchema = z
+  .object({
+    query: z.string().optional(),
+    purpose: z.string().optional(),
+    searchIn: z.enum(['name', 'title', 'category', 'all']).optional(),
+    page: z.number().int().positive().optional(),
+    pageSize: z.number().int().min(1).max(100).optional(),
+  })
+  .refine(data => data.query !== undefined || data.purpose !== undefined, {
+    message: 'Either query or purpose must be provided',
+  });
 
 const GetComponentDependenciesInputSchema = z.object({
   componentId: z.string(),
