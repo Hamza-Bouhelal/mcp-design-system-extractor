@@ -12,7 +12,12 @@ A Model Context Protocol (MCP) server that extracts component information from S
 claude mcp add design-system npx mcp-design-system-extractor@latest \
   --env STORYBOOK_URL=http://localhost:6006
 ```
-
+With bearer token authentication:
+```bash
+claudeclaude mcp add design-system npx mcp-design-system-extractor@latest \
+  --env STORYBOOK_URL=https://my-storybook.example.com \
+  --env STORYBOOK_AUTH_TOKEN=your_bearer_token_here
+```
 With self-signed certificate:
 ```bash
 claude mcp add design-system npx mcp-design-system-extractor@latest \
@@ -61,8 +66,7 @@ npm run setup  # Interactive setup for Claude Desktop
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `STORYBOOK_URL` | URL of your Storybook instance | `http://localhost:6006` |
-| `NODE_TLS_REJECT_UNAUTHORIZED` | Set to `0` to skip SSL certificate verification (for self-signed certs) | `1` |
+| `STORYBOOK_URL` | URL of your Storybook instance | `http://localhost:6006` || `STORYBOOK_AUTH_TOKEN` | Bearer token for authenticated Storybook instances | (none) || `NODE_TLS_REJECT_UNAUTHORIZED` | Set to `0` to skip SSL certificate verification (for self-signed certs) | `1` |
 
 **Example with self-signed certificate:**
 ```json
@@ -73,6 +77,7 @@ npm run setup  # Interactive setup for Claude Desktop
       "args": ["/path/to/dist/index.js"],
       "env": {
         "STORYBOOK_URL": "https://my-storybook.example.com",
+        "STORYBOOK_AUTH_TOKEN": "your_bearer_token_here",
         "NODE_TLS_REJECT_UNAUTHORIZED": "0"
       }
     }

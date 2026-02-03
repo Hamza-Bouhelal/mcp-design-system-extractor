@@ -53,7 +53,8 @@ Or manually add to your Claude Desktop configuration:
       "command": "node",
       "args": ["/path/to/mcp-design-system-extractor/dist/index.js"],
       "env": {
-        "STORYBOOK_URL": "http://localhost:6006"
+        "STORYBOOK_URL": "http://localhost:6006",
+        "STORYBOOK_AUTH_TOKEN": "your_bearer_token_here"
       }
     }
   }
@@ -71,7 +72,8 @@ Add to your `.claude_code_config.json` in the project root:
       "command": "npm",
       "args": ["run", "dev"],
       "env": {
-        "STORYBOOK_URL": "http://localhost:6006"
+        "STORYBOOK_URL": "http://localhost:6006",
+        "STORYBOOK_AUTH_TOKEN": "your_bearer_token_here"
       }
     }
   }
@@ -87,7 +89,8 @@ Or for production build:
       "command": "node",
       "args": ["dist/index.js"],
       "env": {
-        "STORYBOOK_URL": "http://localhost:6006"
+        "STORYBOOK_URL": "http://localhost:6006",
+        "STORYBOOK_AUTH_TOKEN": "your_bearer_token_here"
       }
     }
   }
@@ -97,6 +100,7 @@ Or for production build:
 ## Environment Variables
 
 - `STORYBOOK_URL`: URL of the Storybook instance (default: `http://localhost:6006`)
+- `STORYBOOK_AUTH_TOKEN`: Bearer token for authenticated Storybook instances (optional)
 
 ## Testing
 

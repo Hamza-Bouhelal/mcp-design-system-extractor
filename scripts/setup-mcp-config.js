@@ -121,6 +121,18 @@ async function main() {
 
   console.log(`\n${colors.blue}Selected Storybook URL: ${storybookUrl}${colors.reset}`);
 
+  // Ask about authentication
+  const needsAuth = await question('\nDoes your Storybook require authentication? (y/n): ');
+  let authToken = undefined;
+  
+  if (needsAuth.toLowerCase() === 'y') {
+    authToken = await question('Enter bearer token: ');
+    if (!authToken || authToken.trim() === '') {
+      console.log(`${colors.yellow}⚠️  No token provided, authentication will be skipped${colors.reset}`);
+      authToken = undefined;
+    }
+  }
+
   const testConnection = await question('\nTest connection now? (y/n): ');
   if (testConnection.toLowerCase() === 'y') {
     const connected = await testStorybookConnection(storybookUrl);
@@ -162,7 +174,8 @@ async function main() {
         command: finalNodePath,
         args: [distIndexPath],
         env: {
-          STORYBOOK_URL: storybookUrl
+          STORYBOOK_URL: storybookUrl,
+          ...(authToken ? { STORYBOOK_AUTH_TOKEN: authToken } : {})
         }
       }
     }
@@ -254,7 +267,8 @@ async function main() {
             command: "npm",
             args: ["run", "dev"],
             env: {
-              STORYBOOK_URL: storybookUrl
+              STORYBOOK_URL: storybookUrl,
+              ...(authToken ? { STORYBOOK_AUTH_TOKEN: authToken } : {})
             }
           }
         }

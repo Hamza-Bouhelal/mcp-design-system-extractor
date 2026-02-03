@@ -188,12 +188,20 @@ export async function handleGetExternalCSS(input: any) {
 
     let response;
     try {
+      const headers: Record<string, string> = {
+        Accept: 'text/css,*/*;q=0.1',
+        'User-Agent': 'MCP-Design-System-Extractor/1.0',
+      };
+
+      // Add bearer token if available
+      const authToken = process.env.STORYBOOK_AUTH_TOKEN;
+      if (authToken) {
+        headers.Authorization = `Bearer ${authToken}`;
+      }
+
       response = await fetch(absoluteUrl, {
         signal: controller.signal,
-        headers: {
-          Accept: 'text/css,*/*;q=0.1',
-          'User-Agent': 'MCP-Design-System-Extractor/1.0',
-        },
+        headers,
       });
     } catch (error: any) {
       if (error.name === 'AbortError') {

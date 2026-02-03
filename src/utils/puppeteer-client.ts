@@ -47,12 +47,21 @@ export class PuppeteerClient {
     }
   }
 
-  async fetchComponentHTML(url: string, storyId: string): Promise<ComponentHTML> {
+  async fetchComponentHTML(
+    url: string,
+    storyId: string,
+    authHeaders?: Record<string, string>
+  ): Promise<ComponentHTML> {
     if (!this.page) {
       throw new Error('PuppeteerClient not launched. Call launch() first.');
     }
 
     try {
+      // Set authentication headers if provided
+      if (authHeaders && Object.keys(authHeaders).length > 0) {
+        await this.page.setExtraHTTPHeaders(authHeaders);
+      }
+
       // Navigate to the page
       await this.page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
 

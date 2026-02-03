@@ -12,11 +12,13 @@ import { OPERATION_TIMEOUTS, getEnvironmentTimeout } from './timeout-constants.j
 
 export class StorybookClient {
   private baseUrl: string;
+  private authToken: string | undefined;
   private cache: Cache;
   private puppeteerClient: PuppeteerClient | null = null;
 
   constructor(baseUrl?: string) {
     this.baseUrl = baseUrl || process.env.STORYBOOK_URL || 'http://localhost:6006';
+    this.authToken = process.env.STORYBOOK_AUTH_TOKEN;
 
     // Validate URL
     try {
@@ -38,6 +40,15 @@ export class StorybookClient {
 
   getStorybookUrl(): string {
     return this.baseUrl;
+  }
+
+  private getAuthHeaders(): HeadersInit {
+    if (this.authToken) {
+      return {
+        Authorization: `Bearer ${this.authToken}`,
+      };
+    }
+    return {};
   }
 
   private async getPuppeteerClient(): Promise<PuppeteerClient> {
@@ -72,6 +83,7 @@ export class StorybookClient {
 
         const response = await fetch(url, {
           signal: controller.signal,
+          headers: this.getAuthHeaders(),
         });
 
         clearTimeout(timeoutId);
@@ -134,6 +146,7 @@ export class StorybookClient {
 
       const response = await fetch(url, {
         signal: controller.signal,
+        headers: this.getAuthHeaders(),
       });
 
       clearTimeout(timeoutId);
@@ -176,7 +189,8 @@ export class StorybookClient {
 
       // Static content not available, use Puppeteer for dynamic rendering
       const puppeteerClient = await this.getPuppeteerClient();
-      const result = await puppeteerClient.fetchComponentHTML(url, storyId);
+      const authHeaders = this.authToken ? { Authorization: `Bearer ${this.authToken}` } : undefined;
+      const result = await puppeteerClient.fetchComponentHTML(url, storyId, authHeaders);
 
       this.cache.set(cacheKey, result);
       return result;
